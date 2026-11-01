@@ -1,5 +1,5 @@
 <!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
-<title>مساعد الدعم الفني</title>
+<title>مساعد الدعم الفني</title>البيانات
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -276,7 +276,7 @@ td.act .btn+.btn{margin-inline-start:6px}
       </div>
       <nav class="tabs" role="tablist" aria-label="أقسام الصفحة">
         <button role="tab" id="tabChat" data-tab="chat" aria-selected="true"><svg class="ic"><use href="#i-chat"/></svg>المحادثة</button>
-        <button role="tab" id="tabKb" data-tab="kb" aria-selected="false"><svg class="ic"><use href="#i-book"/></svg>قاعدة المعرفة</button>
+        <button role="tab" id="tabKb" data-tab="kb" aria-selected="false"><svg class="ic"><use href="#i-book"/></svg>قاعدة البيانات</button>
       </nav>
       <span class="status" id="status" title="مصدر الردود"><i></i><span id="statusTx">جارٍ التحميل…</span></span>
     </div>
@@ -317,13 +317,13 @@ td.act .btn+.btn{margin-inline-start:6px}
         </div>
       </section>
 
-      <section class="kb" id="viewKb" aria-label="قاعدة المعرفة" hidden>
+      <section class="kb" id="viewKb" aria-label="قاعدة البيانات" hidden>
         <div class="kb-head">
           <div>
-            <h2>قاعدة المعرفة</h2>
+            <h2>قاعدة البيانات</h2>
             <p id="kbCount"></p>
           </div>
-          <label class="search"><svg class="ic"><use href="#i-search"/></svg><input id="kbSearch" type="search" placeholder="ابحث في الاستفسارات والمشاكل" aria-label="بحث في قاعدة المعرفة"></label>
+          <label class="search"><svg class="ic"><use href="#i-search"/></svg><input id="kbSearch" type="search" placeholder="ابحث في الاستفسارات والمشاكل" aria-label="بحث في قاعدة البيانات"></label>
         </div>
         <div class="table-wrap">
           <table>
@@ -586,7 +586,7 @@ td.act .btn+.btn{margin-inline-start:6px}
   }
   function addThinking(){
     return addHTML('<div class="row"><div class="avatar">'+ico('ai')+'</div><div class="think"><ul>'+
-      ['استقبال السؤال وتحليله','البحث في قاعدة المعرفة','صياغة الإجابة وترتيبها'].map(function(s){ return '<li><span class="dot"></span>'+s+'</li>'; }).join('')+
+      ['استقبال السؤال وتحليله','البحث في قاعدة البيانات','صياغة الإجابة وترتيبها'].map(function(s){ return '<li><span class="dot"></span>'+s+'</li>'; }).join('')+
       '</ul></div></div>');
   }
   async function think(node){
@@ -600,7 +600,7 @@ td.act .btn+.btn{margin-inline-start:6px}
   }
   function answerHTML(res){
     if(res.none){
-      return '<div class="row"><div class="avatar">'+ico('ai')+'</div><article class="ans"><div class="nomatch"><h3>'+(res.message?'لم أجد حلًا موثقًا':'لم أجد حلًا مطابقًا في قاعدة المعرفة')+'</h3><p style="white-space:pre-line">'+(res.message?esc(res.message):'جرّب صياغة أخرى، أو اذكر اسم الموديول ونص رسالة الخطأ كما تظهر في أودو، أو غيّر نوع السؤال إلى «الكل». هذه بعض المواضيع المتاحة:')+'</p><div class="rel">'+
+      return '<div class="row"><div class="avatar">'+ico('ai')+'</div><article class="ans"><div class="nomatch"><h3>'+(res.message?'لم أجد حلًا موثقًا':'لم أجد حلًا مطابقًا في قاعدة البيانات')+'</h3><p style="white-space:pre-line">'+(res.message?esc(res.message):'جرّب صياغة أخرى، أو اذكر اسم الموديول ونص رسالة الخطأ كما تظهر في أودو، أو غيّر نوع السؤال إلى «الكل». هذه بعض المواضيع المتاحة:')+'</p><div class="rel">'+
         KB.slice(0,4).map(function(e){ return '<button class="chip" data-ask="'+esc(e.title)+'">'+esc(e.title)+'</button>'; }).join('')+'</div></div></article></div>';
     }
     if(res.error){
@@ -666,7 +666,7 @@ td.act .btn+.btn{margin-inline-start:6px}
     } else { done(fallbackCopy(text)); }
   }
 
-  /* تبويبات وقاعدة المعرفة */
+  /* تبويبات وقاعدة البيانات */
   function setView(v){
     $('#viewChat').hidden = v!=='chat'; $('#viewKb').hidden = v!=='kb';
     $('#tabChat').setAttribute('aria-selected',v==='chat'); $('#tabKb').setAttribute('aria-selected',v==='kb');
@@ -716,7 +716,7 @@ td.act .btn+.btn{margin-inline-start:6px}
     else { try{ sheetOk = await loadSheet(); }catch(e){ err = 'تعذّر تحميل Google Sheets ('+((e&&e.message)||e)+'). تأكد أن الجدول منشور (ملف ← مشاركة ← نشر على الويب) وأن عمود Status = Approved.'; } }
     renderCats(); renderQuick();
     $('#statusTx').textContent = err ? 'تعذّر تحميل الجدول' : (live ? 'متصل بـ n8n وGoogle Sheets' : 'البيانات من Google Sheets');
-    addHTML('<div class="note">'+esc(err || 'اكتب استفسارك أو صف مشكلتك وسيبحث المساعد في قاعدة المعرفة')+'</div>');
+    addHTML('<div class="note">'+esc(err || 'اكتب استفسارك أو صف مشكلتك وسيبحث المساعد في قاعدة البيانات')+'</div>');
   }
   init();
 })();
