@@ -1,5 +1,5 @@
 <!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
-<title>مساعد الدعم الفني</title>البيانات
+<title>مساعد الدعم الفني</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -276,7 +276,7 @@ td.act .btn+.btn{margin-inline-start:6px}
       </div>
       <nav class="tabs" role="tablist" aria-label="أقسام الصفحة">
         <button role="tab" id="tabChat" data-tab="chat" aria-selected="true"><svg class="ic"><use href="#i-chat"/></svg>المحادثة</button>
-        <button role="tab" id="tabKb" data-tab="kb" aria-selected="false"><svg class="ic"><use href="#i-book"/></svg>قاعدة البيانات</button>
+        <button role="tab" id="tabKb" data-tab="kb" aria-selected="false"><svg class="ic"><use href="#i-book"/></svg>قاعدة المعرفة</button>
       </nav>
       <span class="status" id="status" title="مصدر الردود"><i></i><span id="statusTx">جارٍ التحميل…</span></span>
     </div>
@@ -317,13 +317,13 @@ td.act .btn+.btn{margin-inline-start:6px}
         </div>
       </section>
 
-      <section class="kb" id="viewKb" aria-label="قاعدة البيانات" hidden>
+      <section class="kb" id="viewKb" aria-label="قاعدة المعرفة" hidden>
         <div class="kb-head">
           <div>
-            <h2>قاعدة البيانات</h2>
+            <h2>قاعدة المعرفة</h2>
             <p id="kbCount"></p>
           </div>
-          <label class="search"><svg class="ic"><use href="#i-search"/></svg><input id="kbSearch" type="search" placeholder="ابحث في الاستفسارات والمشاكل" aria-label="بحث في قاعدة البيانات"></label>
+          <label class="search"><svg class="ic"><use href="#i-search"/></svg><input id="kbSearch" type="search" placeholder="ابحث في الاستفسارات والمشاكل" aria-label="بحث في قاعدة المعرفة"></label>
         </div>
         <div class="table-wrap">
           <table>
@@ -410,9 +410,46 @@ td.act .btn+.btn{margin-inline-start:6px}
     return null;
   }
   function fromText(t,q,cat,type){
-    t = String(t).trim();
+    t = String(t).replace(/\r/g,'').trim();
     if(!t) return { none:true };
-    return { entry:{ id:'AI', cat:cat!==ALL?cat:'المساعد', type:type!==ALL?type:'استفسار', title:q.length>90?q.slice(0,90)+'…':q, summary:t, steps:[], code:[], updated:new Date().toISOString().slice(0,10) }, related:[] };
+    var code = [];
+    t = t.replace(/```([a-zA-Z0-9+#_-]*)[ \t]*\n?([\s\S]*?)```/g,function(m,l,c){
+      code.push({ label:'الكود', lang:l?l.toUpperCase():'Code', text:c.replace(/\s+$/,'') }); return '\n';
+    });
+    var sum=[], steps=[], rel=[], notes=[], mode='sum';
+    t.split('\n').forEach(function(raw){
+      var l = raw.replace(/^[#>\s]+/,'').replace(/\*\*|__/g,'').trim();
+      if(!l) return;
+      if(/^(حلول ذات صلة|ذات صلة|مواضيع ذات صلة|أسئلة ذات صلة|related)\s*[:：]?$/i.test(l)){ mode='rel'; return; }
+      if(/^(خطوات التنفيذ|الخطوات|خطوات)\s*[:：]?$/.test(l)){ mode='steps'; return; }
+      if(/^(الحل|الإجابة|الجواب|السبب المحتمل|السبب)\s*[:：]?$/.test(l)){ if(mode!=='rel') mode='sum'; return; }
+      l = l.replace(/^(الحل|الإجابة|الجواب)\s*[:：]\s*/,'');
+      var m = l.match(/^(?:\d+\s*[.)\-]|[-•*●▪])\s+(.*)$/);
+      if(m){ if(mode==='rel') rel.push(m[1]); else { mode='steps'; steps.push(m[1]); } return; }
+      if(mode==='rel') rel.push(l);
+      else if(mode==='steps' && steps.length) notes.push(l);
+      else sum.push(l);
+    });
+    var ty = type!==ALL ? type : (/خطأ|لا يمكن|لا يعمل|لا تعمل|مشكل|تعذر|تعذّر|رسالة|error|fail/i.test(q) ? 'مشكلة' : 'استفسار');
+    var e = { id:'', cat:cat!==ALL?cat:'عام', type:ty, title:q.length>120?q.slice(0,120)+'…':q, summary:sum.join('\n'), cause:'', version:'', notes:notes.join('\n'), steps:steps, code:code, updated:new Date().toISOString().slice(0,10) };
+    var res = { entry:e, conf:null, related:rel.slice(0,3).map(function(x){ return { title:x }; }) };
+    /* إكمال بيانات البطاقة (الرقم، القسم، التاريخ، الحلول ذات الصلة) من صف الجدول الأقرب للسؤال */
+    var all = rank(q,cat,type), top = all[0];
+    if(top && top.s>=3){
+      var k = top.e;
+      e.id = k.id; e.cat = k.cat; e.type = k.type; e.version = k.version; e.updated = k.updated || e.updated; e.title = k.title;
+      if(!e.summary) e.summary = k.summary;
+      if(!e.steps.length) e.steps = k.steps;
+      if(!e.code.length) e.code = k.code;
+      if(!e.cause) e.cause = k.cause;
+      res.conf = Math.max(62,Math.min(97,58+top.s*6));
+      if(!res.related.length){
+        res.related = all.slice(1,3).map(function(x){ return { title:x.e.title }; });
+        if(res.related.length<2) KB.forEach(function(x){ if(x!==k && x.cat===k.cat && res.related.length<2 && !res.related.some(function(r){ return r.title===x.title; })) res.related.push({ title:x.title }); });
+      }
+    }
+    if(!e.summary && !e.steps.length) e.summary = t;
+    return res;
   }
   function fromObj(p,q,cat,type){
     if(p.none) return { none:true, message:String(p.message||'') };
@@ -525,18 +562,26 @@ td.act .btn+.btn{margin-inline-start:6px}
     if(CONFIG.webhookUrl){
       try{
         var ctx = [cat!==ALL?'القسم: '+cat:'', type!==ALL?'النوع: '+type:''].filter(Boolean).join(' | ');
-        var res = await fetch(CONFIG.webhookUrl,{
-          method:'POST', headers:{'Content-Type':'application/json'},
-          body:JSON.stringify({ action:'sendMessage', sessionId:SID, chatInput:(ctx?'['+ctx+']\n':'')+q, question:q, category:cat===ALL?null:cat, type:type===ALL?null:type })
-        });
-        if(!res.ok) throw new Error('HTTP '+res.status);
+        var body = JSON.stringify({ action:'sendMessage', sessionId:SID, chatInput:(ctx?'['+ctx+']\n':'')+q, question:q, category:cat===ALL?null:cat, type:type===ALL?null:type });
+        var urls = [CONFIG.webhookUrl];
+        if(!/\/chat\/?$/.test(CONFIG.webhookUrl)) urls.push(CONFIG.webhookUrl.replace(/\/$/,'')+'/chat');
+        var res = null, lastE = null;
+        for(var u=0; u<urls.length; u++){
+          try{
+            res = await fetch(urls[u],{ method:'POST', headers:{'Content-Type':'application/json'}, body:body });
+            if(res.ok){ lastE = null; break; }
+            lastE = new Error('HTTP '+res.status+' من '+urls[u]); res = null;
+          }catch(e){ lastE = new Error((e&&e.message||e)+' ('+urls[u]+')'); res = null; }
+        }
+        if(!res) throw lastE;
         var raw = await res.text(), data;
         try{ data = JSON.parse(raw); }catch(e){ data = raw; }
         if(Array.isArray(data)) data = data[0];
+        if(data && typeof data==='object' && data.message==='Workflow was started') throw new Error('الـ Webhook يرد فوراً (Workflow was started). غيّر Respond إلى When Last Node Finishes');
         var out = (data && typeof data==='object') ? (data.output!=null ? data.output : (data.text!=null ? data.text : (data.response!=null ? data.response : data))) : data;
         var obj = (out && typeof out==='object') ? out : extractJSON(out);
         return obj ? fromObj(obj,q,cat,type) : fromText(out,q,cat,type);
-      }catch(e){ return { error:true }; }
+      }catch(e){ console.error('n8n error:',e); return { error:true, msg:String((e&&e.message)||e) }; }
     }
     return { error:true };
   }
@@ -586,7 +631,7 @@ td.act .btn+.btn{margin-inline-start:6px}
   }
   function addThinking(){
     return addHTML('<div class="row"><div class="avatar">'+ico('ai')+'</div><div class="think"><ul>'+
-      ['استقبال السؤال وتحليله','البحث في قاعدة البيانات','صياغة الإجابة وترتيبها'].map(function(s){ return '<li><span class="dot"></span>'+s+'</li>'; }).join('')+
+      ['استقبال السؤال وتحليله','البحث في قاعدة المعرفة','صياغة الإجابة وترتيبها'].map(function(s){ return '<li><span class="dot"></span>'+s+'</li>'; }).join('')+
       '</ul></div></div>');
   }
   async function think(node){
@@ -600,11 +645,11 @@ td.act .btn+.btn{margin-inline-start:6px}
   }
   function answerHTML(res){
     if(res.none){
-      return '<div class="row"><div class="avatar">'+ico('ai')+'</div><article class="ans"><div class="nomatch"><h3>'+(res.message?'لم أجد حلًا موثقًا':'لم أجد حلًا مطابقًا في قاعدة البيانات')+'</h3><p style="white-space:pre-line">'+(res.message?esc(res.message):'جرّب صياغة أخرى، أو اذكر اسم الموديول ونص رسالة الخطأ كما تظهر في أودو، أو غيّر نوع السؤال إلى «الكل». هذه بعض المواضيع المتاحة:')+'</p><div class="rel">'+
+      return '<div class="row"><div class="avatar">'+ico('ai')+'</div><article class="ans"><div class="nomatch"><h3>'+(res.message?'لم أجد حلًا موثقًا':'لم أجد حلًا مطابقًا في قاعدة المعرفة')+'</h3><p style="white-space:pre-line">'+(res.message?esc(res.message):'جرّب صياغة أخرى، أو اذكر اسم الموديول ونص رسالة الخطأ كما تظهر في أودو، أو غيّر نوع السؤال إلى «الكل». هذه بعض المواضيع المتاحة:')+'</p><div class="rel">'+
         KB.slice(0,4).map(function(e){ return '<button class="chip" data-ask="'+esc(e.title)+'">'+esc(e.title)+'</button>'; }).join('')+'</div></div></article></div>';
     }
     if(res.error){
-      return '<div class="row"><div class="avatar">'+ico('ai')+'</div><article class="ans"><div class="nomatch"><h3>تعذّر الاتصال بالمساعد</h3><p>لم يصل رد من خادم n8n. تأكد أن الـ Workflow مفعّل (Active)، وأن رابط الـ Webhook صحيح، وأن إعداد CORS في عقدة الشات يسمح بدومين موقعك، ثم أعد المحاولة.</p></div></article></div>';
+      return '<div class="row"><div class="avatar">'+ico('ai')+'</div><article class="ans"><div class="nomatch"><h3>تعذّر الاتصال بالمساعد</h3><p>لم يصل رد من خادم n8n. تأكد أن الـ Workflow مفعّل (Active)، وأن رابط الـ Webhook صحيح، وأن إعداد CORS في عقدة الشات يسمح بدومين موقعك، ثم أعد المحاولة.</p>'+(res.msg?'<p dir="ltr" style="font-family:monospace;font-size:12px;opacity:.8">'+esc(res.msg)+'</p>':'')+'</div></article></div>';
     }
     var e = res.entry, hasConf = res.conf!=null, conf = Math.round(res.conf||0);
     var kAll = reg(fullText(e)), kSum = reg(e.summary), kSteps = reg(e.steps.map(function(s,i){ return (i+1)+'. '+s; }).join('\n'));
@@ -614,7 +659,7 @@ td.act .btn+.btn{margin-inline-start:6px}
     }).join('');
     var rel = (res.related||[]).map(function(r){ return '<button class="chip" data-ask="'+esc(r.title)+'">'+esc(r.title)+'</button>'; }).join('');
     return '<div class="row"><div class="avatar">'+ico('ai')+'</div><article class="ans">'+
-      '<header class="ans-head"><div class="meta"><span class="pill">'+esc(e.cat)+'</span><span class="pill t">'+esc(e.type)+'</span>'+(e.version?'<span class="pill t">Odoo '+esc(e.version)+'</span>':'')+'<span class="kbid">'+esc(e.id)+'</span><span>آخر تحديث: '+fmtDate(e.updated)+'</span>'+
+      '<header class="ans-head"><div class="meta"><span class="pill">'+esc(e.cat)+'</span><span class="pill t">'+esc(e.type)+'</span>'+(e.version?'<span class="pill t">Odoo '+esc(e.version)+'</span>':'')+''+(e.id&&e.id!=='AI'?'<span class="kbid">'+esc(e.id)+'</span>':'')+'<span>آخر تحديث: '+fmtDate(e.updated)+'</span>'+
       (hasConf?'<span class="conf" title="درجة التطابق مع السؤال"><span class="bar"><i style="width:'+conf+'%"></i></span><b>'+conf+'%</b><span>تطابق</span></span>':'')+'</div>'+
       '<h3>'+esc(e.title)+'</h3></header>'+
       '<section class="sum">'+ico('chat')+'<div class="tx"><h4>'+(e.type==='مشكلة'?'الحل':'الإجابة')+'</h4><p>'+esc(e.summary)+'</p></div><button class="btn sm" data-copy="'+kSum+'">'+ico('copy')+'<span>نسخ</span></button></section>'+
@@ -666,7 +711,7 @@ td.act .btn+.btn{margin-inline-start:6px}
     } else { done(fallbackCopy(text)); }
   }
 
-  /* تبويبات وقاعدة البيانات */
+  /* تبويبات وقاعدة المعرفة */
   function setView(v){
     $('#viewChat').hidden = v!=='chat'; $('#viewKb').hidden = v!=='kb';
     $('#tabChat').setAttribute('aria-selected',v==='chat'); $('#tabKb').setAttribute('aria-selected',v==='kb');
@@ -716,7 +761,7 @@ td.act .btn+.btn{margin-inline-start:6px}
     else { try{ sheetOk = await loadSheet(); }catch(e){ err = 'تعذّر تحميل Google Sheets ('+((e&&e.message)||e)+'). تأكد أن الجدول منشور (ملف ← مشاركة ← نشر على الويب) وأن عمود Status = Approved.'; } }
     renderCats(); renderQuick();
     $('#statusTx').textContent = err ? 'تعذّر تحميل الجدول' : (live ? 'متصل بـ n8n وGoogle Sheets' : 'البيانات من Google Sheets');
-    addHTML('<div class="note">'+esc(err || 'اكتب استفسارك أو صف مشكلتك وسيبحث المساعد في قاعدة البيانات')+'</div>');
+    addHTML('<div class="note">'+esc(err || 'اكتب استفسارك أو صف مشكلتك وسيبحث المساعد في قاعدة المعرفة')+'</div>');
   }
   init();
 })();
