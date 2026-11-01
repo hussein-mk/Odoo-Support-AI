@@ -77,6 +77,47 @@ button{cursor:pointer}
 .tabs button[aria-selected="true"]{background:var(--ink-fg);color:#1B2A41}
 .status{display:flex;align-items:center;gap:8px;font-size:12.5px;color:rgba(244,241,232,.78);padding:6px 12px;border:1px solid rgba(255,255,255,.16);border-radius:999px;flex:none}
 .status i{width:8px;height:8px;border-radius:50%;background:#D9B45F}
+.notify{position:relative;flex:none}
+.notify-btn{position:relative;width:42px;height:42px;display:grid;place-items:center;border:1px solid rgba(255,255,255,.18);border-radius:12px;background:rgba(255,255,255,.08);color:var(--ink-fg)}
+.notify-btn:hover,.notify-btn[aria-expanded="true"]{background:rgba(255,255,255,.16)}
+.notify-badge{position:absolute;top:-6px;inset-inline-start:-6px;min-width:20px;height:20px;padding:0 5px;display:grid;place-items:center;border:2px solid var(--ink);border-radius:999px;background:#D9534F;color:#fff;font-size:11.5px;font-weight:600;line-height:1}
+.notify-badge[hidden]{display:none}
+.notify-drop{position:absolute;z-index:30;top:calc(100% + 12px);inset-inline-end:0;width:min(440px,calc(100vw - 32px));overflow:hidden;border:1px solid var(--line);border-radius:14px;background:var(--surface);color:var(--fg);box-shadow:var(--shadow)}
+.notify-drop[hidden]{display:none}
+.notify-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px;border-bottom:1px solid var(--line);background:var(--surface-2)}
+.notify-head b{font-family:var(--font-display);font-size:13.5px}
+.notify-head span{color:var(--muted);font-size:12.5px}
+.notify-list{max-height:min(62vh,520px);overflow-y:auto}
+.notify-item{display:grid;gap:8px;padding:14px 16px;border-bottom:1px solid var(--line)}
+.notify-item:last-child{border-bottom:0}
+.notify-question{font-weight:600;line-height:1.6}
+.notify-meta{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;color:var(--muted);font-size:12.5px}
+.notify-brief{display:grid;gap:7px;padding:9px 11px;border:1px solid var(--line);border-radius:10px;background:var(--surface-2)}
+.notify-solution{color:var(--fg);font-size:13px;line-height:1.6}
+.notify-solution b,.notify-steps b{display:block;margin-bottom:4px;color:var(--muted);font-size:12.5px;font-weight:600}
+.notify-solution p{display:-webkit-box;margin:0;overflow:hidden;line-clamp:2;-webkit-box-orient:vertical;-webkit-line-clamp:2}
+.notify-steps ol{margin:0;padding-inline-start:20px;display:grid;gap:2px;font-size:12.5px;line-height:1.5}
+.notify-steps li{display:-webkit-box;overflow:hidden;line-clamp:1;-webkit-box-orient:vertical;-webkit-line-clamp:1}
+.notify-more{display:block;margin-top:3px;color:var(--muted);font-size:12px}
+.notify-actions{display:flex;flex-wrap:wrap;gap:8px}
+.notify-actions .btn.approve{background:var(--green);border-color:transparent;color:#fff}
+.notify-actions .btn.approve:hover{filter:brightness(1.08);background:var(--green)}
+.notify-dialog{width:min(700px,calc(100vw - 32px));max-width:none;max-height:min(86vh,760px);margin:auto;padding:0;overflow:hidden;border:1px solid var(--line);border-radius:14px;background:var(--surface);color:var(--fg);box-shadow:var(--shadow)}
+.notify-dialog::backdrop{background:rgba(9,18,32,.58);backdrop-filter:blur(3px)}
+.notify-dialog-inner{display:grid;grid-template-rows:auto minmax(0,1fr) auto;max-height:inherit}
+.notify-dialog-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:16px 20px;border-bottom:1px solid var(--line);background:var(--surface-2)}
+.notify-dialog-head h2{margin:7px 0 0;font:700 16px/1.6 var(--font-display)}
+.notify-dialog-body{display:grid;align-content:start;gap:14px;overflow:auto;padding:18px 20px}
+.notify-dialog-body>p{margin:0;color:var(--muted);font-size:13px}
+.notify-dialog-body label{display:grid;gap:6px;color:var(--muted);font-size:13px;font-weight:600}
+.notify-dialog-body textarea{width:100%;min-height:112px;resize:vertical;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--fg);font:inherit;font-weight:400;line-height:1.7}
+.notify-dialog-body textarea[name="notifyDialogSteps"]{min-height:190px}
+.notify-dialog-foot{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 20px;border-top:1px solid var(--line);background:var(--surface-2)}
+.notify-dialog-foot .notify-sign{flex:1}
+.notify-dialog-actions{display:flex;flex-wrap:wrap;gap:8px}
+.notify-dialog-actions .btn.approve{background:var(--green);border-color:transparent;color:#fff}
+.notify-sign{display:flex;align-items:center;gap:6px;color:var(--muted);font-size:12.5px}
+.notify-empty{padding:26px 16px;text-align:center;color:var(--muted)}
 
 /* workspace */
 .body{width:100%;max-width:1360px;margin:0 auto;min-height:0;display:grid;grid-template-columns:300px minmax(0,1fr);gap:20px;padding-block:18px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
@@ -243,11 +284,19 @@ td.act .btn+.btn{margin-inline-start:6px}
 }
 @media (max-width:640px){
   .status{display:none}
-  .tabs{width:100%}
+  .brand{order:1;flex:1 1 calc(100% - 56px)}
+  .notify{order:2}
+  .tabs{order:3;width:100%}
   .tabs button{flex:1;justify-content:center}
   .brand p{display:none}
   .user{max-width:92%}
   .avatar{display:none}
+  .notify-drop{position:fixed;top:calc(env(safe-area-inset-top,0px) + 72px);inset-inline:16px;width:auto}
+  .notify-dialog{width:calc(100vw - 20px);max-height:92dvh;border-radius:12px}
+  .notify-dialog-head,.notify-dialog-body{padding-left:15px;padding-right:15px}
+  .notify-dialog-foot{align-items:stretch;flex-direction:column;padding:12px 15px}
+  .notify-dialog-actions{display:grid;grid-template-columns:1fr 1fr}
+  .notify-dialog-actions .btn.approve{grid-column:1/-1}
   .ans-head,.sec,.sum,.foot{padding-left:16px;padding-right:16px}
   .conf{margin-inline-start:0}
   .hint .keys{display:none}
@@ -259,6 +308,7 @@ td.act .btn+.btn{margin-inline-start:6px}
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 9a6 6 0 1 1 12 0c0 6 2.5 7.5 2.5 7.5h-17S6 15 6 9z"/><path d="M10 20a2 2 0 0 0 4 0"/></symbol>
   <symbol id="i-monitor" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></symbol>
   <symbol id="i-flow" viewBox="0 0 24 24"><rect x="3" y="3" width="8" height="8" rx="2"/><rect x="13" y="13" width="8" height="8" rx="2"/><path d="M7 11v4a2 2 0 0 0 2 2h4"/></symbol>
   <symbol id="i-ai" viewBox="0 0 24 24"><path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/></symbol>
@@ -289,6 +339,15 @@ td.act .btn+.btn{margin-inline-start:6px}
         <button role="tab" id="tabChat" data-tab="chat" aria-selected="true"><svg class="ic"><use href="#i-chat"/></svg>المحادثة</button>
         <button role="tab" id="tabKb" data-tab="kb" aria-selected="false"><svg class="ic"><use href="#i-book"/></svg>قاعدة البيانات</button>
       </nav>
+      <div class="notify" id="notify">
+        <button class="notify-btn" id="notifyBtn" type="button" aria-label="الإشعارات" aria-expanded="false" aria-controls="notifyDrop">
+          <svg class="ic"><use href="#i-bell"/></svg><span class="notify-badge" id="notifyBadge" aria-label="3 إشعارات">3</span>
+        </button>
+        <section class="notify-drop" id="notifyDrop" aria-label="الإشعارات بانتظار الاعتماد" hidden>
+          <div class="notify-head"><b>بانتظار اعتمادك</b><span id="notifyCount">3 طلبات</span></div>
+          <div class="notify-list" id="notifyList"></div>
+        </section>
+      </div>
       <span class="status" id="status" title="مصدر الردود"><i></i><span id="statusTx">جارٍ التحميل…</span></span>
     </div>
   </header>
@@ -346,6 +405,29 @@ td.act .btn+.btn{margin-inline-start:6px}
     </div>
   </div>
 </div>
+<dialog class="notify-dialog" id="notifyDialog" aria-labelledby="notifyDialogTitle">
+  <div class="notify-dialog-inner">
+    <header class="notify-dialog-head">
+      <div><div class="notify-meta" id="notifyDialogMeta"></div><h2 id="notifyDialogTitle"></h2></div>
+      <button class="btn" type="button" data-notify-dialog-action="close">إغلاق</button>
+    </header>
+    <div class="notify-dialog-body">
+      <p>راجع الحل والخطوات، وعدّل ما يلزم قبل الاعتماد.</p>
+      <label for="notifyDialogSolution">الحل المقترح</label>
+      <textarea id="notifyDialogSolution" name="notifyDialogSolution"></textarea>
+      <label for="notifyDialogSteps">خطوات التنفيذ <span>اكتب كل خطوة في سطر مستقل</span></label>
+      <textarea id="notifyDialogSteps" name="notifyDialogSteps"></textarea>
+    </div>
+    <footer class="notify-dialog-foot">
+      <span class="notify-sign"><svg class="ic"><use href="#i-check"/></svg>سيُسجّل الاعتماد باسم م. خالد العتيبي</span>
+      <div class="notify-dialog-actions">
+        <button class="btn" type="button" data-notify-dialog-action="close">إلغاء</button>
+        <button class="btn" type="button" data-notify-dialog-action="save">حفظ التعديلات</button>
+        <button class="btn approve" type="button" data-notify-dialog-action="approve"><svg class="ic"><use href="#i-check"/></svg>اعتماد</button>
+      </div>
+    </footer>
+  </div>
+</dialog>
 <div id="toast" role="status" aria-live="polite"></div>
 
 <script>
@@ -353,10 +435,7 @@ td.act .btn+.btn{margin-inline-start:6px}
   document.documentElement.setAttribute('dir','rtl');
   document.documentElement.setAttribute('lang','ar');
 
-  /* الإعدادات: املأ الرابطين ثم ارفع الصفحة على موقعك.
-     webhookUrl: رابط Production من عقدة «When chat message received» في n8n (ينتهي بـ /chat).
-     sheetCsvUrl: رابط CSV المنشور من Google Sheets (ملف ← مشاركة ← نشر على الويب ← CSV).
-     عند ترك أي رابط فارغًا تعمل الصفحة بالبيانات التجريبية الموجودة داخلها. */
+
   var CONFIG = {
     webhookUrl: 'https://husseinmk98.app.n8n.cloud/webhook/4d82941f-34a2-4def-af19-bca5ce58c3b6',
     sheetCsvUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRXi_6iZcBz3Y9hHTmAUmFM_veQSFQ1bfuYf0b0_FqObEWmDABOpdgmbs-2GgJ7S_Zii-nEOu9j80IV/pubhtml?gid=1502078177&single=true'
@@ -367,6 +446,102 @@ td.act .btn+.btn{margin-inline-start:6px}
   var sleep = function(ms){ return new Promise(function(r){ setTimeout(r,ms); }); };
   var esc = function(s){ return String(s).replace(/[&<>"']/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); };
   var ico = function(n,c){ return '<svg class="ic'+(c?' '+c:'')+'"><use href="#i-'+n+'"/></svg>'; };
+
+  /* إشعارات توضيحية محلية؛ لا تُحفظ في قاعدة البيانات أو Sheets. */
+  var notifyMe = 'م. خالد العتيبي';
+  var notifications = [
+    { id:'n1', q:'كيف أحل مشكلة عدم ترحيل قيود المبيعات؟', cat:'المحاسبة', cust:'شركة النور', time:'قبل 5 دقائق', sol:'تحقق من إعدادات دفتر اليومية في المبيعات، وفعّل خيار الترحيل التلقائي للفواتير.', steps:['تحقق من دفتر اليومية المرتبط بالمبيعات.','فعّل خيار الترحيل التلقائي للفواتير.','أعد ترحيل الفواتير المعلقة يدويًا.'] },
+    { id:'n2', q:'خطأ عند طباعة تقرير المخزون بصيغة PDF', cat:'المخزون', cust:'مؤسسة الأفق', time:'قبل 22 دقيقة', sol:'حدّث قالب التقرير وتأكد من صلاحيات الطباعة للمستخدم.', steps:['تحقق من إصدار قالب التقرير المستخدم.','راجع صلاحيات الطباعة للمستخدم.','أعد إنشاء التقرير بصيغة PDF.'] },
+    { id:'n3', q:'لا تظهر خانة الضريبة في فاتورة المشتريات', cat:'المشتريات', cust:'شركة الرؤية', time:'قبل ساعة', sol:'اربط الضريبة بالمنتج من تبويب المحاسبة ثم احفظ.', steps:['افتح بطاقة المنتج من قائمة المنتجات.','اربط الضريبة المطلوبة من تبويب المحاسبة.','احفظ المنتج وأنشئ فاتورة مشتريات جديدة.'] }
+  ];
+  function renderNotifications(){
+    var count = notifications.length;
+    $('#notifyBadge').textContent = count;
+    $('#notifyBadge').hidden = !count;
+    $('#notifyBadge').setAttribute('aria-label',count+' إشعارات');
+    $('#notifyCount').textContent = count===1 ? 'طلب واحد' : (count===2 ? 'طلبان' : count+' طلبات');
+    $('#notifyList').innerHTML = count ? notifications.map(function(d){
+      return '<article class="notify-item" data-notify-id="'+esc(d.id)+'">'+
+        '<div class="notify-meta"><span class="pill">'+esc(d.cat)+'</span><span>العميل: '+esc(d.cust)+'</span><span>· '+esc(d.time)+'</span></div>'+
+        '<div class="notify-question">'+esc(d.q)+'</div>'+
+        '<div class="notify-brief"><div class="notify-solution"><b>الحل المقترح</b><p>'+esc(d.sol)+'</p></div><div class="notify-steps"><b>خطوات التنفيذ · '+d.steps.length+'</b><ol>'+d.steps.slice(0,2).map(function(step){ return '<li>'+esc(step)+'</li>'; }).join('')+'</ol>'+(d.steps.length>2?'<span class="notify-more">و '+(d.steps.length-2)+' خطوات أخرى</span>':'')+'</div></div>'+
+        '<div class="notify-actions"><button class="btn primary" type="button" data-notify-action="review" aria-haspopup="dialog" aria-controls="notifyDialog">'+ico('book')+'مراجعة الحل</button><button class="btn approve" type="button" data-notify-action="approve-direct">'+ico('check')+'اعتماد الحل</button></div>'+
+      '</article>';
+    }).join('') : '<div class="notify-empty">لا توجد طلبات بانتظار الاعتماد.</div>';
+  }
+  function completeNotification(id){
+    notifications = notifications.filter(function(d){ return d.id!==id; });
+    renderNotifications();
+    toast('تم الاعتماد من قبل م. حسين مخارش');
+  }
+  var notifyBtn = $('#notifyBtn'), notifyDrop = $('#notifyDrop'), notifyList = $('#notifyList');
+  var notifyDialog = $('#notifyDialog'), activeNotificationId = null;
+  function openNotificationReview(id){
+    var data = notifications.filter(function(d){ return d.id===id; })[0];
+    if(!data) return;
+    activeNotificationId = id;
+    $('#notifyDialogTitle').textContent = data.q;
+    $('#notifyDialogMeta').innerHTML = '<span class="pill">'+esc(data.cat)+'</span><span>العميل: '+esc(data.cust)+'</span><span>· '+esc(data.time)+'</span>';
+    $('#notifyDialogSolution').value = data.sol;
+    $('#notifyDialogSteps').value = data.steps.join('\n');
+    notifyDialog.showModal();
+    $('#notifyDialogSolution').focus();
+  }
+  function readNotificationDialog(){
+    var data = notifications.filter(function(d){ return d.id===activeNotificationId; })[0];
+    if(!data) return null;
+    var solution = $('#notifyDialogSolution').value.trim();
+    var steps = $('#notifyDialogSteps').value.split(/\r?\n/).map(function(step){ return step.replace(/^\s*(?:\d+[.)\-]|[-•])\s*/,'').trim(); }).filter(Boolean);
+    if(!solution || !steps.length){ toast('أدخل الحل وخطوة واحدة على الأقل'); return null; }
+    data.sol=solution; data.steps=steps;
+    return data;
+  }
+  notifyBtn.addEventListener('click',function(){
+    var open = notifyDrop.hidden;
+    notifyDrop.hidden = !open;
+    notifyBtn.setAttribute('aria-expanded',String(open));
+  });
+  notifyList.addEventListener('click',function(ev){
+    var button = ev.target.closest('[data-notify-action]');
+    if(!button) return;
+    ev.stopPropagation();
+    var id = button.closest('.notify-item').dataset.notifyId;
+    if(button.dataset.notifyAction==='review') openNotificationReview(id);
+    if(button.dataset.notifyAction==='approve-direct') completeNotification(id);
+  });
+  notifyDialog.addEventListener('click',function(ev){
+    var button = ev.target.closest('[data-notify-dialog-action]');
+    if(!button) return;
+    ev.stopPropagation();
+    var action = button.dataset.notifyDialogAction;
+    if(action==='close'){ notifyDialog.close(); return; }
+    var data = readNotificationDialog();
+    if(!data) return;
+    if(action==='save'){
+      renderNotifications();
+      notifyDialog.close();
+      toast('تم حفظ التعديلات محليًا');
+      return;
+    }
+    if(action==='approve'){
+      notifyDialog.close();
+      completeNotification(data.id);
+    }
+  });
+  document.addEventListener('click',function(ev){
+    if(!$('#notify').contains(ev.target)){
+      notifyDrop.hidden = true;
+      notifyBtn.setAttribute('aria-expanded','false');
+    }
+  });
+  document.addEventListener('keydown',function(ev){
+    if(ev.key==='Escape' && !notifyDrop.hidden){
+      notifyDrop.hidden = true;
+      notifyBtn.setAttribute('aria-expanded','false');
+      notifyBtn.focus();
+    }
+  });
+  renderNotifications();
 
   /* بيانات تجريبية تمثل جدول الحلول في PostgreSQL. type: استفسار أو مشكلة */
   var KB = [];
