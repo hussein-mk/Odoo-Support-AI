@@ -97,10 +97,18 @@ button{cursor:pointer}
 .cats-row{display:none;gap:8px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}
 .cats-row::-webkit-scrollbar{display:none}
 .cats-row .chip{flex:none}
-.panel{flex:1;min-height:0;display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);overflow:hidden}
+@property --runner-angle{syntax:'<angle>';inherits:false;initial-value:0deg}
+.panel{flex:1;min-height:0;display:flex;flex-direction:column;background:linear-gradient(var(--surface),var(--surface)) padding-box,conic-gradient(from var(--runner-angle),transparent 0deg,#22D3EE 18deg,#3B82F6 42deg,transparent 78deg,transparent 360deg) border-box,linear-gradient(var(--line),var(--line)) border-box;border:1px solid transparent;border-radius:18px;box-shadow:var(--shadow);overflow:hidden;animation:border-run 3s linear infinite,panel-glow 3.4s ease-in-out infinite}
+@keyframes border-run{to{--runner-angle:360deg}}
+@keyframes panel-glow{0%,100%{box-shadow:var(--shadow),0 0 8px 1px rgba(34,211,238,.2)}50%{box-shadow:var(--shadow),0 0 22px 4px rgba(59,130,246,.34)}}
 .scroll{flex:1;min-height:0;overflow-y:auto;padding:24px;scroll-behavior:smooth}
-.thread{max-width:860px;margin:0 auto;display:flex;flex-direction:column;gap:22px}
-.note{align-self:center;font-size:12.5px;color:var(--gold-text);background:var(--gold-tint);padding:4px 14px;border-radius:999px}
+.thread{max-width:860px;min-height:100%;margin:0 auto;display:flex;flex-direction:column;gap:22px}
+.welcome{flex:1;min-height:280px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:24px;text-align:center}
+.welcome-mark{width:64px;height:64px;display:grid;place-items:center;border:1px solid var(--gold-ring);border-radius:20px;background:var(--gold-tint);color:var(--gold-text);box-shadow:0 8px 24px rgba(20,32,52,.08)}
+.welcome-mark .ic{width:30px;height:30px}
+.welcome h2{margin:0;font-family:var(--font-display);font-size:20px;line-height:1.5;color:var(--fg)}
+.welcome p{max-width:480px;margin:0;color:var(--muted);font-size:14px;line-height:1.8}
+.welcome .welcome-error{color:var(--gold-text);font-size:12.5px}
 
 .user{align-self:flex-start;max-width:min(80%,620px);background:var(--ink);color:var(--ink-fg);padding:11px 16px;border-radius:16px;border-end-start-radius:4px;line-height:1.75;overflow-wrap:anywhere}
 .user small{display:block;font-size:11.5px;color:rgba(244,241,232,.62);margin-top:2px}
@@ -183,8 +191,9 @@ html[data-theme="dark"] ol.steps li::before{background:var(--sel-bg)}
 .quick{display:flex;gap:8px;overflow-x:auto;padding-bottom:10px;scrollbar-width:none}
 .quick::-webkit-scrollbar{display:none}
 .quick .chip{flex:none}
-.field{display:flex;gap:10px;align-items:flex-end;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:8px 14px 8px 8px}
-.field:focus-within{border-color:var(--gold);box-shadow:0 0 0 3px var(--gold-ring)}
+.field{display:flex;gap:10px;align-items:flex-end;background:linear-gradient(var(--surface),var(--surface)) padding-box,conic-gradient(from var(--runner-angle),transparent 0deg,#22D3EE 18deg,#3B82F6 42deg,transparent 78deg,transparent 360deg) border-box,linear-gradient(var(--line),var(--line)) border-box;border:1px solid transparent;border-radius:14px;padding:8px 14px 8px 8px;animation:border-run 3s linear infinite,field-glow 3s ease-in-out infinite}
+@keyframes field-glow{0%,100%{box-shadow:0 0 7px 1px rgba(34,211,238,.24)}50%{box-shadow:0 0 16px 3px rgba(59,130,246,.4)}}
+.field:focus-within{border-color:#22D3EE;outline:2px solid rgba(34,211,238,.35);outline-offset:2px}
 .field textarea{flex:1;min-width:0;border:0;outline:0;background:transparent;resize:none;padding:8px 6px;max-height:140px;line-height:1.7}
 .field textarea::placeholder{color:var(--muted)}
 .send{width:44px;height:44px;padding:0;border-radius:11px;flex:none}
@@ -763,7 +772,7 @@ td.act .btn+.btn{margin-inline-start:6px}
     else { try{ sheetOk = await loadSheet(); }catch(e){ err = 'تعذّر تحميل Google Sheets ('+((e&&e.message)||e)+'). تأكد أن الجدول منشور (ملف ← مشاركة ← نشر على الويب) وأن عمود Status = Approved.'; } }
     renderCats(); renderQuick();
     $('#statusTx').textContent = err ? 'تعذّر تحميل الجدول' : (live ? 'متصل بـ n8n وGoogle Sheets' : 'البيانات من Google Sheets');
-    addHTML('<div class="note">'+esc(err || 'اكتب استفسارك أو صف مشكلتك وسيبحث المساعد في قاعدة البيانات')+'</div>');
+    addHTML('<div class="welcome"><span class="welcome-mark">'+ico('ai')+'</span><h2>كيف أقدر أساعدك؟</h2><p>اسأل عن أي موديول في أودو أو صف المشكلة التي تواجهك.</p>'+(err?'<p class="welcome-error">'+esc(err)+'</p>':'')+'</div>');
   }
   init();
 })();
