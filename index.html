@@ -419,7 +419,7 @@ td.act .btn+.btn{margin-inline-start:6px}
       <textarea id="notifyDialogSteps" name="notifyDialogSteps"></textarea>
     </div>
     <footer class="notify-dialog-foot">
-      <span class="notify-sign"><svg class="ic"><use href="#i-check"/></svg>سيُسجّل الاعتماد باسم م. خالد العتيبي</span>
+      <span class="notify-sign"><svg class="ic"><use href="#i-check"/></svg>سيُسجّل الاعتماد باسم م. حسين مخارش</span>
       <div class="notify-dialog-actions">
         <button class="btn" type="button" data-notify-dialog-action="close">إلغاء</button>
         <button class="btn" type="button" data-notify-dialog-action="save">حفظ التعديلات</button>
@@ -448,7 +448,7 @@ td.act .btn+.btn{margin-inline-start:6px}
   var ico = function(n,c){ return '<svg class="ic'+(c?' '+c:'')+'"><use href="#i-'+n+'"/></svg>'; };
 
   /* إشعارات توضيحية محلية؛ لا تُحفظ في قاعدة البيانات أو Sheets. */
-  var notifyMe = 'م. خالد العتيبي';
+  var notifyMe = 'م. حسين مخارش';
   var notifications = [
     { id:'n1', q:'كيف أحل مشكلة عدم ترحيل قيود المبيعات؟', cat:'المحاسبة', cust:'شركة النور', time:'قبل 5 دقائق', sol:'تحقق من إعدادات دفتر اليومية في المبيعات، وفعّل خيار الترحيل التلقائي للفواتير.', steps:['تحقق من دفتر اليومية المرتبط بالمبيعات.','فعّل خيار الترحيل التلقائي للفواتير.','أعد ترحيل الفواتير المعلقة يدويًا.'] },
     { id:'n2', q:'خطأ عند طباعة تقرير المخزون بصيغة PDF', cat:'المخزون', cust:'مؤسسة الأفق', time:'قبل 22 دقيقة', sol:'حدّث قالب التقرير وتأكد من صلاحيات الطباعة للمستخدم.', steps:['تحقق من إصدار قالب التقرير المستخدم.','راجع صلاحيات الطباعة للمستخدم.','أعد إنشاء التقرير بصيغة PDF.'] },
